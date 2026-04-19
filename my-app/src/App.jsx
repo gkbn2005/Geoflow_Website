@@ -1,5 +1,6 @@
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useNavigate, Navigate } from "react-router-dom";
 import Login from "./Login";
+import DashboardHome from "./Dashboard"; // 👈 IMPORTANT
 
 function Home() {
   const navigate = useNavigate();
@@ -29,19 +30,20 @@ function Home() {
   );
 }
 
-function LoginPage() {
-  return <Login />;
-}
-
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Home page */}
-        <Route path="/" element={<Home />} />
 
-        {/* Login page */}
-        <Route path="/login" element={<LoginPage />} />
+        {/* Redirect root → login (cleaner flow) */}
+        <Route path="/" element={<Navigate to="/login" />} />
+
+        {/* Login */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Dashboard (THIS WAS MISSING) */}
+        <Route path="/dashboard" element={<DashboardHome />} />
+
       </Routes>
     </BrowserRouter>
   );

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import Dashboard from "./Dashboard";
+
 export default function Login() {
   const navigate = useNavigate();
 
@@ -16,7 +18,7 @@ export default function Login() {
     }
 
     if (username === "admin" && password === "1234") {
-      navigate("/dashboard");
+      navigate("/Dashboard");
     } else {
       alert("Invalid username or password");
     }

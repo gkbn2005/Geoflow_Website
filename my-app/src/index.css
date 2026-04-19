@@ -94,3 +94,33 @@ code {
   background: var(--code-bg);
   border-radius: 4px;
 }
+
+/* ✅ BACKGROUND ANIMATION */
+.animated-bg {
+  background: linear-gradient(270deg, #e6f6ff, #dff3ff, #dbeafe);
+  background-size: 600% 600%;
+  animation: gradientMove 6s linear infinite;;
+}
+
+/* ✅ FLOATING BLOBS */
+.blob {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  filter: blur(120px);
+}
+
+.blob-1 {
+  background: #0ea5e9;
+  top: 10%;
+  left: 10%;
+  animation: float 2s ease-in-out infinite;;
+}
+
+.blob-2 {
+  background: #60a5fa;
+  bottom: 10%;
+  right: 10%;
+  animation: float 2s ease-in-out infinite;;
+}

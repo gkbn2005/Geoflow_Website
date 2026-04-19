@@ -7,7 +7,6 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  // ✅ LOGIN FUNCTION
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -16,7 +15,6 @@ export default function Login() {
       return;
     }
 
-    // 🔐 Replace with backend later
     if (username === "admin" && password === "1234") {
       navigate("/dashboard");
     } else {
@@ -26,47 +24,20 @@ export default function Login() {
 
   return (
     <div
+      className="animated-bg"
       style={{
         width: "100vw",
         height: "100vh",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "linear-gradient(270deg, #e6f6ff, #dff3ff, #dbeafe)",
-        backgroundSize: "600% 600%",
-        animation: "gradientMove 10s ease infinite",
         position: "relative",
         overflow: "hidden",
       }}
     >
-      {/* 🔵 FLOATING BLOBS */}
-      <div
-        style={{
-          position: "absolute",
-          width: "300px",
-          height: "300px",
-          background: "#0ea5e9",
-          borderRadius: "50%",
-          filter: "blur(120px)",
-          top: "10%",
-          left: "10%",
-          animation: "float 8s ease-in-out infinite",
-        }}
-      ></div>
-
-      <div
-        style={{
-          position: "absolute",
-          width: "300px",
-          height: "300px",
-          background: "#60a5fa",
-          borderRadius: "50%",
-          filter: "blur(120px)",
-          bottom: "10%",
-          right: "10%",
-          animation: "float 10s ease-in-out infinite",
-        }}
-      ></div>
+      {/* 🔵 BLOBS */}
+      <div className="blob blob-1"></div>
+      <div className="blob blob-2"></div>
 
       {/* LOGIN CARD */}
       <div

@@ -41,7 +41,7 @@ export default function Login() {
        alert(data.message || "Login failed");
      }
    } catch (err) {
-     console.error("Server error:", err);
+     console.error("Email or Password is Incorrect!", err);
      alert("Server error (check Laravel)");
    }
  };

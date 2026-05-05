@@ -1,48 +1,23 @@
-import { BrowserRouter, Routes, Route, useNavigate, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./Login";
-import DashboardHome from "./Dashboard"; // 👈 IMPORTANT
-
-function Home() {
-  const navigate = useNavigate();
-
-  return (
-    <div style={{
-      height: "100vh",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      alignItems: "center"
-    }}>
-      <h1>Welcome to GeoFlow</h1>
-
-      <button
-        onClick={() => navigate("/login")}
-        style={{
-          padding: "12px 20px",
-          fontSize: "16px",
-          cursor: "pointer",
-          marginTop: "20px"
-        }}
-      >
-        Go to Login
-      </button>
-    </div>
-  );
-}
+import Dashboard from "./Dashboard";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* Redirect root → login (cleaner flow) */}
+        {/* root redirect */}
         <Route path="/" element={<Navigate to="/login" />} />
 
-        {/* Login */}
+        {/* login */}
         <Route path="/login" element={<Login />} />
 
-        {/* Dashboard (THIS WAS MISSING) */}
-        <Route path="/dashboard" element={<DashboardHome />} />
+        {/* DASHBOARD (ALL PAGES INSIDE HERE) */}
+        <Route path="/dashboard/*" element={<Dashboard />} />
+
+        {/* fallback (prevents white page issues) */}
+        <Route path="*" element={<Navigate to="/dashboard" />} />
 
       </Routes>
     </BrowserRouter>

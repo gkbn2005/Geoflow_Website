@@ -65,7 +65,7 @@ html, body {
 }
 
 /* =========================
-   TYPOGRAPHY (keep Figma look)
+   TYPOGRAPHY
 ========================= */
 h1,
 h2 {
@@ -95,14 +95,18 @@ code {
   border-radius: 4px;
 }
 
-/* ✅ BACKGROUND ANIMATION */
+/* =========================
+   LOGIN
+========================= */
+
+/* BACKGROUND ANIMATION */
 .animated-bg {
   background: linear-gradient(270deg, #e6f6ff, #dff3ff, #dbeafe);
   background-size: 600% 600%;
   animation: gradientMove 6s linear infinite;;
 }
 
-/* ✅ FLOATING BLOBS */
+/* FLOATING BLOBS */
 .blob {
   position: absolute;
   width: 300px;
@@ -203,6 +207,10 @@ code {
   overflow: hidden;
 }
 
+.dashboard-section {
+  margin-bottom: 32px;
+}
+
 /* Sidebar */
 .sidebar {
   width: 260px;
@@ -275,7 +283,7 @@ code {
 .dashboard-scroll {
   flex: 1;
   overflow-y: auto;
-  padding: 24px;
+  padding: 40px;
 }
 
 /* =========================
@@ -285,7 +293,7 @@ code {
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 24px;
 }
 
 /* responsive fallback */

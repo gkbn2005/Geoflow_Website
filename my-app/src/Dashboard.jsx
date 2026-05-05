@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import {
   LayoutDashboard,
   Map,
@@ -8,13 +7,7 @@ import {
   Settings,
   LogOut,
   Search,
-  User,
-  TrendingUp,
-  TrendingDown,
-  AlertCircle,
-  CheckCircle2,
-  Clock,
-  MapPin
+  User
 } from "lucide-react";
 
 import {
@@ -33,12 +26,11 @@ import {
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
 
-  // ===================== DATA =====================
   const stats = [
-    { label: "Total Leaks", value: "124", change: "+12%", trend: "up", color: "#6366f1", icon: AlertCircle },
-    { label: "Active Leaks", value: "56", change: "+8%", trend: "up", color: "#ef4444", icon: AlertCircle },
-    { label: "Resolved Today", value: "18", change: "+5%", trend: "up", color: "#22c55e", icon: CheckCircle2 },
-    { label: "Avg Response Time", value: "2.4h", change: "-15%", trend: "down", color: "#0ea5e9", icon: Clock },
+    { label: "Total Leaks", value: "124" },
+    { label: "Active Leaks", value: "56" },
+    { label: "Resolved Today", value: "18" },
+    { label: "Avg Response Time", value: "2.4h" },
   ];
 
   const lineData = [
@@ -58,20 +50,10 @@ export default function Dashboard() {
   ];
 
   const recentLeaks = [
-    { id: "GF-1023", location: "Balboa Blvd", severity: "High", time: "Just now" },
-    { id: "GF-1022", location: "Maple St", severity: "Medium", time: "10 mins ago" },
-    { id: "GF-1021", location: "Cedar Ave", severity: "Low", time: "1 hour ago" },
-    { id: "GF-1020", location: "Pine Rd", severity: "High", time: "2 hours ago" },
+    { id: "GF-1023", location: "Balboa Blvd", severity: "high" },
+    { id: "GF-1022", location: "Maple St", severity: "medium" },
+    { id: "GF-1021", location: "Cedar Ave", severity: "low" },
   ];
-
-  const getSeverityColor = (severity) => {
-    switch (severity) {
-      case "High": return "#ef4444";
-      case "Medium": return "#f59e0b";
-      case "Low": return "#22c55e";
-      default: return "#94a3b8";
-    }
-  };
 
   const navItems = [
     { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -81,94 +63,12 @@ export default function Dashboard() {
     { id: "settings", icon: Settings, label: "Settings" },
   ];
 
-  // ===================== DASHBOARD UI =====================
-  const DashboardHome = () => (
-    <div className="p-6">
-
-      {/* HEADER */}
-      <h1 style={{ fontSize: 28, fontWeight: 700 }}>Welcome back, Admin</h1>
-      <p style={{ color: "#5b6b7a" }}>Overview of system activity</p>
-
-      {/* STATS */}
-      <div className="grid grid-cols-4 gap-4" style={{ marginTop: 20 }}>
-        {stats.map((s, i) => (
-          <div key={i} className="card" style={{ padding: 30 }}>
-            <div style={{ display: "flex", justifyContent: "space-between" }}>
-              <s.icon style={{ color: s.color }} />
-              <span>{s.change}</span>
-            </div>
-            <div style={{ fontSize: 26, fontWeight: 700 }}>{s.value}</div>
-            <div style={{ color: "#5b6b7a" }}>{s.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* CHARTS */}
-      <div className="grid grid-cols-3 gap-4" style={{ marginTop: 20 }}>
-
-        <div className="card p-4" style={{ gridColumn: "span 2" }}>
-          <h3>Leaks This Week</h3>
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={lineData}>
-              <CartesianGrid stroke="#eee" />
-              <XAxis dataKey="day" />
-              <YAxis />
-              <Tooltip />
-              <Line dataKey="leaks" stroke="#1a9ba8" />
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="card p-4">
-          <h3>Status</h3>
-          <ResponsiveContainer width="100%" height={200}>
-            <PieChart>
-              <Pie data={pieData} dataKey="value" outerRadius={80}>
-                {pieData.map((e, i) => (
-                  <Cell key={i} fill={e.color} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-
-      </div>
-
-      {/* RECENT */}
-      <div className="card p-4" style={{ marginTop: 20 }}>
-        <h3>Recent Leaks</h3>
-
-        {recentLeaks.map((l) => (
-          <div
-            key={l.id}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              padding: 12,
-              borderBottom: "1px solid #eee"
-            }}
-          >
-            <div>
-              <strong>{l.id}</strong> - {l.location}
-            </div>
-
-            <div style={{ color: getSeverityColor(l.severity) }}>
-              {l.severity}
-            </div>
-          </div>
-        ))}
-      </div>
-
-    </div>
-  );
-
-  // ===================== MAIN UI =====================
   return (
-    <div style={{ display: "flex", height: "100vh" }}>
+    <div className="dashboard-layout">
 
       {/* SIDEBAR */}
       <div className="sidebar">
-        <h2 style={{ color: "#1a9ba8" }}>GeoFlow</h2>
+        <h2 style={{ color: "#1a9ba8", marginBottom: 20 }}>GeoFlow</h2>
 
         {navItems.map((item) => (
           <div
@@ -182,56 +82,106 @@ export default function Dashboard() {
         ))}
 
         <div style={{ marginTop: "auto" }} className="nav-item">
-          <LogOut size={18} />
-          Logout
+          <LogOut size={18} /> Logout
         </div>
       </div>
 
       {/* MAIN */}
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          padding: "24px",
-          gap: "16px",
-          background: "#f8fafb"
-        }}
-      >
+      <div className="main-content">
 
         {/* TOPBAR */}
         <div className="topbar">
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <Search />
-            <input className="search-input" placeholder="Search..." />
+            <input className="search-input" placeholder="Search Reports..." />
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <User />
-            Admin
+            <User /> Admin
           </div>
         </div>
 
         {/* CONTENT */}
-        <div style={{ flex: 1, overflow: "auto" }}>
+        <div className="dashboard-scroll">
 
-          {activeTab === "dashboard" && <DashboardHome />}
+          {/* STATS */}
+          <div className="dashboard-section">
+            <div className="stats-grid">
+              {stats.map((s, i) => (
+                <div key={i} className="card p-5">
+                  <p className="stat-label">{s.label}</p>
+                  <h2 className="stat-value">{s.value}</h2>
+                </div>
+              ))}
+            </div>
+          </div>
 
-          {activeTab === "map" && (
-            <div style={{ padding: 20 }}>Map (not built yet)</div>
-          )}
+          {/* CHARTS */}
+          <div className="dashboard-section">
+            <div className="charts-grid">
 
-          {activeTab === "reports" && (
-            <div style={{ padding: 20 }}>Reports (not built yet)</div>
-          )}
+              <div className="card chart-card">
+                <h3 className="section-title">Leaks This Week</h3>
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={lineData}>
+                    <CartesianGrid stroke="#eee" />
+                    <XAxis dataKey="day" />
+                    <YAxis />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="leaks" stroke="#1a9ba8" strokeWidth={3} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
 
-          {activeTab === "analytics" && (
-            <div style={{ padding: 20 }}>Analytics (not built yet)</div>
-          )}
+              <div className="card chart-card">
+                <h3 className="section-title">Status Distribution</h3>
+                <ResponsiveContainer width="100%" height={220}>
+                  <PieChart>
+                    <Pie data={pieData} dataKey="value" innerRadius={50} outerRadius={80}>
+                      {pieData.map((e, i) => (
+                        <Cell key={i} fill={e.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
 
-          {activeTab === "settings" && (
-            <div style={{ padding: 20 }}>Settings (not built yet)</div>
-          )}
+                <div className="mt-4 space-y-2">
+                  {pieData.map((p, i) => (
+                    <div key={i} className="flex justify-between text-sm">
+                      <div className="flex items-center gap-2">
+                        <span className="w-3 h-3 rounded-full" style={{ background: p.color }}></span>
+                        {p.name}
+                      </div>
+                      <span>{p.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* RECENT */}
+          <div className="dashboard-section">
+            <div className="card p-5">
+              <h3 className="section-title">Recent Leak Detections</h3>
+
+              {recentLeaks.map((l) => (
+                <div key={l.id} className="list-item">
+                  <div>
+                    <p style={{ fontWeight: 600 }}>{l.id}</p>
+                    <p style={{ fontSize: 13, color: "#5b6b7a" }}>{l.location}</p>
+                  </div>
+
+                  <span className={`badge ${l.severity}`}>
+                    {l.severity}
+                  </span>
+
+                  <button className="btn-primary">View</button>
+                </div>
+              ))}
+            </div>
+          </div>
 
         </div>
       </div>

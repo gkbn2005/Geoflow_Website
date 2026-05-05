@@ -9,20 +9,42 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+   e.preventDefault();
 
-    if (!username || !password) {
-      alert("Please fill in all fields");
-      return;
-    }
+   if (!username || !password) {
+     alert("Please fill in all fields");
+     return;
+   }
 
-    if (username === "admin" && password === "1234") {
-      navigate("/Dashboard");
-    } else {
-      alert("Invalid username or password");
-    }
-  };
+   try {
+     const res = await fetch("http://127.0.0.1:8000/api/login", {
+       method: "POST",
+       headers: {
+         "Content-Type": "application/json",
+       },
+       body: JSON.stringify({
+         email: username, // IMPORTANT: backend expects email
+         password: password,
+       }),
+     });
+
+     const data = await res.json();
+
+     if (res.ok && data.token) {
+       localStorage.setItem("token", data.token);
+
+       console.log("Login success");
+
+       navigate("/Dashboard");
+     } else {
+       alert(data.message || "Login failed");
+     }
+   } catch (err) {
+     console.error("Server error:", err);
+     alert("Server error (check Laravel)");
+   }
+ };
 
   return (
     <div
@@ -125,6 +147,23 @@ export default function Login() {
             }}
           >
             Login
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate("/signup")}
+            style={{
+              marginTop: "10px",
+              width: "100%",
+              padding: "12px",
+              background: "transparent",
+              color: "#0ea5e9",
+              border: "1px solid #0ea5e9",
+              borderRadius: "10px",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            Create Account
           </button>
         </form>
       </div>

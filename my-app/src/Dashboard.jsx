@@ -1,4 +1,7 @@
 import Reports from "./Reports";
+import MapView from "./MapView";
+import Settings from "./Settings";
+import Analytics from "./Analytics";
 
 import { useNavigate, Routes, Route } from "react-router-dom";
 import {
@@ -6,7 +9,7 @@ import {
   Map,
   FileText,
   BarChart3,
-  Settings,
+ Settings as SettingsIcon,
   LogOut,
   Search,
   User,
@@ -30,6 +33,17 @@ import {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    const confirmLogout = window.confirm("Are you sure you want to log out?");
+
+    if (confirmLogout) {
+      // optional: clear auth data
+      localStorage.removeItem("token");
+
+      navigate("/login");
+    }
+  };
 
   // ===================== DATA =====================
   const stats = [
@@ -156,13 +170,17 @@ export default function Dashboard() {
           <BarChart3 size={18} /> Analytics
         </div>
 
-        <div className="nav-item" onClick={() => navigate("/dashboard/settings")}>
-          <Settings size={18} /> Settings
-        </div>
+       <div className="nav-item" onClick={() => navigate("/dashboard/settings")}>
+         <SettingsIcon size={18} /> Settings
+       </div>
 
-        <div className="nav-item" style={{ marginTop: "auto" }}>
-          <LogOut size={18} /> Logout
-        </div>
+          <div
+            className="nav-item"
+            style={{ marginTop: "auto" }}
+            onClick={handleLogout}
+          >
+            <LogOut size={18} /> Logout
+          </div>
       </div>
 
       {/* MAIN CONTENT */}
@@ -189,10 +207,10 @@ export default function Dashboard() {
             {/* Dashboard Home */}
             <Route index element={<DashboardHome />} />
             <Route path="reports" element={<Reports />} />
-            {/* PLACEHOLDER PAGES */}
-            <Route path="map" element={<h2>Map Page (Coming Soon)</h2>} />
-            <Route path="analytics" element={<h2>Analytics Page (Coming Soon)</h2>} />
-            <Route path="settings" element={<h2>Settings Page (Coming Soon)</h2>} />
+            <Route path="map" element={<MapView />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="analytics" element={<Analytics />} />
+
 
           </Routes>
 

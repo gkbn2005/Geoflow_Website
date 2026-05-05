@@ -15,19 +15,16 @@ export default function Settings() {
   const [activeTab, setActiveTab] = useState("General");
 
   const [settings, setSettings] = useState({
-    // GENERAL
     serviceArea: "Los Angeles, CA",
     timezone: "Pacific Time (PT)",
     units: "Imperial (ft, gal)",
     update: "Real-time",
     automation: true,
 
-    // LEAK REPORTS
     alertThreshold: "High Only",
     autoAssign: true,
     notifications: true,
 
-    // USER & SECURITY
     email: "admin@geoflow.com",
     twoFactor: false,
   });
@@ -46,7 +43,7 @@ export default function Settings() {
   };
 
   return (
-    <div>
+    <div style={{ padding: 20 }}>
 
       {/* SEARCH */}
       <input
@@ -68,147 +65,143 @@ export default function Settings() {
         ))}
       </div>
 
-      {/* ================= GENERAL ================= */}
-      {activeTab === "General" && (
-        <div className="card" style={{ padding: 20 }}>
+      {/* CARD */}
+      <div className="card" style={{ padding: 20 }}>
 
-          <SettingRow
-            icon={<MapPin />}
-            label="Service area"
-            value={settings.serviceArea}
-            onClick={() => {
-              const val = prompt("Enter Service Area:", settings.serviceArea);
-              if (val) updateSetting("serviceArea", val);
-            }}
-          />
+        {/* ================= GENERAL ================= */}
+        {activeTab === "General" && (
+          <>
+            <SettingRow
+              icon={<MapPin />}
+              label="Service area"
+              value={settings.serviceArea}
+              onClick={() => {
+                const val = prompt("Enter Service Area:", settings.serviceArea);
+                if (val) updateSetting("serviceArea", val);
+              }}
+            />
 
-          <SettingRow
-            icon={<Clock />}
-            label="Time Zone"
-            value={settings.timezone}
-            onClick={() => {
-              const val = prompt("Enter Time Zone:", settings.timezone);
-              if (val) updateSetting("timezone", val);
-            }}
-          />
+            <SettingRow
+              icon={<Clock />}
+              label="Time Zone"
+              value={settings.timezone}
+              onClick={() => {
+                const val = prompt("Enter Time Zone:", settings.timezone);
+                if (val) updateSetting("timezone", val);
+              }}
+            />
 
-          <SettingRow
-            icon={<Ruler />}
-            label="Measurement Units"
-            value={settings.units}
-            onClick={() => {
-              const val = prompt("Enter Units:", settings.units);
-              if (val) updateSetting("units", val);
-            }}
-          />
+            <SettingRow
+              icon={<Ruler />}
+              label="Measurement Units"
+              value={settings.units}
+              onClick={() => {
+                const val = prompt("Enter Units:", settings.units);
+                if (val) updateSetting("units", val);
+              }}
+            />
 
-          <SettingRow
-            icon={<RefreshCw />}
-            label="Update Frequency"
-            value={settings.update}
-            onClick={() => {
-              const val = prompt("Enter Update Frequency:", settings.update);
-              if (val) updateSetting("update", val);
-            }}
-          />
+            <SettingRow
+              icon={<RefreshCw />}
+              label="Update Frequency"
+              value={settings.update}
+              onClick={() => {
+                const val = prompt("Enter Update Frequency:", settings.update);
+                if (val) updateSetting("update", val);
+              }}
+            />
 
-          <ToggleRow
-            icon={<Zap />}
-            label="Enable System Automation"
-            value={settings.automation}
-            onToggle={() =>
-              updateSetting("automation", !settings.automation)
-            }
-          />
-
-        </div>
-      )}
-
-      {/* ================= LEAK REPORTS ================= */}
-      {activeTab === "Leak Reports" && (
-        <div className="card" style={{ padding: 20 }}>
-
-          <SettingRow
-            icon={<Bell />}
-            label="Alert Threshold"
-            value={settings.alertThreshold}
-            onClick={() => {
-              const val = prompt(
-                "Enter Alert Level (Low / Medium / High):",
-                settings.alertThreshold
-              );
-              if (val) updateSetting("alertThreshold", val);
-            }}
-          />
-
-          <ToggleRow
-            icon={<User />}
-            label="Auto Assign Technicians"
-            value={settings.autoAssign}
-            onToggle={() =>
-              updateSetting("autoAssign", !settings.autoAssign)
-            }
-          />
-
-          <ToggleRow
-            icon={<Bell />}
-            label="Enable Notifications"
-            value={settings.notifications}
-            onToggle={() =>
-              updateSetting("notifications", !settings.notifications)
-            }
-          />
-
-        </div>
-      )}
-
-      {/* ================= USER & SECURITY ================= */}
-      {activeTab === "User Data & Security" && (
-        <div className="card" style={{ padding: 20 }}>
-
-          <SettingRow
-            icon={<User />}
-            label="Email Address"
-            value={settings.email}
-            onClick={() => {
-              const val = prompt("Update Email:", settings.email);
-              if (val) updateSetting("email", val);
-            }}
-          />
-
-          <SettingRow
-            icon={<Lock />}
-            label="Change Password"
-            value="********"
-            onClick={() => {
-              alert("Password change feature coming soon 🔒");
-            }}
-          />
-
-          <ToggleRow
-            icon={<Shield />}
-            label="Two-Factor Authentication"
-            value={settings.twoFactor}
-            onToggle={() =>
-              updateSetting("twoFactor", !settings.twoFactor)
-            }
-          />
-
-          <div
-            className="setting-row"
-            style={{ color: "red" }}
-            onClick={() => {
-              if (window.confirm("Log out from all devices?")) {
-                alert("All sessions cleared");
+            <ToggleRow
+              icon={<Zap />}
+              label="Enable System Automation"
+              value={settings.automation}
+              onToggle={() =>
+                updateSetting("automation", !settings.automation)
               }
-            }}
-          >
-            <span>Log out from all devices</span>
-          </div>
+            />
+          </>
+        )}
 
-        </div>
-      )}
+        {/* ================= LEAK REPORTS ================= */}
+        {activeTab === "Leak Reports" && (
+          <>
+            <SettingRow
+              icon={<Bell />}
+              label="Alert Threshold"
+              value={settings.alertThreshold}
+              onClick={() => {
+                const val = prompt(
+                  "Enter Alert Level (Low / Medium / High):",
+                  settings.alertThreshold
+                );
+                if (val) updateSetting("alertThreshold", val);
+              }}
+            />
 
+            <ToggleRow
+              icon={<User />}
+              label="Auto Assign Technicians"
+              value={settings.autoAssign}
+              onToggle={() =>
+                updateSetting("autoAssign", !settings.autoAssign)
+              }
+            />
+
+            <ToggleRow
+              icon={<Bell />}
+              label="Enable Notifications"
+              value={settings.notifications}
+              onToggle={() =>
+                updateSetting("notifications", !settings.notifications)
+              }
+            />
+          </>
+        )}
+
+        {/* ================= USER & SECURITY ================= */}
+        {activeTab === "User Data & Security" && (
+          <>
+            <SettingRow
+              icon={<User />}
+              label="Email Address"
+              value={settings.email}
+              onClick={() => {
+                const val = prompt("Update Email:", settings.email);
+                if (val) updateSetting("email", val);
+              }}
+            />
+
+            <SettingRow
+              icon={<Lock />}
+              label="Change Password"
+              value="********"
+              onClick={() => alert("Password change feature coming soon 🔒")}
+            />
+
+            <ToggleRow
+              icon={<Shield />}
+              label="Two-Factor Authentication"
+              value={settings.twoFactor}
+              onToggle={() =>
+                updateSetting("twoFactor", !settings.twoFactor)
+              }
+            />
+
+            <div
+              className="setting-row"
+              style={{ color: "red" }}
+              onClick={() => {
+                if (window.confirm("Log out from all devices?")) {
+                  alert("All sessions cleared");
+                }
+              }}
+            >
+              <span>Log out from all devices</span>
+            </div>
+          </>
+        )}
+
+      </div>
     </div>
   );
 }
@@ -218,14 +211,14 @@ export default function Settings() {
 function SettingRow({ icon, label, value, onClick }) {
   return (
     <div className="setting-row" onClick={onClick}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         {icon}
         <div>
-          <div>{label}</div>
-          <small>{value}</small>
+          <div style={{ fontWeight: 500 }}>{label}</div>
+          <small style={{ color: "#6b7280" }}>{value}</small>
         </div>
       </div>
-      <span>{">"}</span>
+      <span style={{ color: "#9ca3af" }}>{">"}</span>
     </div>
   );
 }
@@ -233,7 +226,7 @@ function SettingRow({ icon, label, value, onClick }) {
 function ToggleRow({ icon, label, value, onToggle }) {
   return (
     <div className="setting-row">
-      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         {icon}
         <span>{label}</span>
       </div>

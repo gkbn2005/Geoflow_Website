@@ -83,8 +83,10 @@ export default function Reports() {
     }
   };
 
+  // FIXED CSV EXPORT (syntax corrected)
   const exportCSV = () => {
     const header = "ID,Type,Confidence,Location,Status,Time\n";
+
     const rows = filteredReports
       .map(
         (r) =>
@@ -99,6 +101,8 @@ export default function Reports() {
     a.href = url;
     a.download = "reports.csv";
     a.click();
+
+    window.URL.revokeObjectURL(url);
   };
 
   return (
@@ -125,17 +129,33 @@ export default function Reports() {
       />
 
       {/* FILTER BAR */}
-      <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
-
-        {/* LEAK TYPE */}
+      <div
+        style={{
+          display: "flex",
+          gap: 10,
+          marginBottom: 20,
+          flexWrap: "wrap",
+        }}
+      >
+        {/* TYPE */}
         <div style={{ position: "relative" }}>
-          <button onClick={() => setOpenMenu(openMenu === "type" ? "" : "type")} className="btn">
+          <button
+            className="btn-primary"
+            onClick={() =>
+              setOpenMenu(openMenu === "type" ? "" : "type")
+            }
+          >
             Leak Type ▼
           </button>
 
           {openMenu === "type" && (
             <div style={dropdownStyle}>
-              {["All", "Active Leak", "Early Leak", "Possible Deterioration"].map((t) => (
+              {[
+                "All",
+                "Active Leak",
+                "Early Leak",
+                "Possible Deterioration",
+              ].map((t) => (
                 <div
                   key={t}
                   onClick={() => {
@@ -153,7 +173,12 @@ export default function Reports() {
 
         {/* STATUS */}
         <div style={{ position: "relative" }}>
-          <button onClick={() => setOpenMenu(openMenu === "status" ? "" : "status")} className="btn">
+          <button
+            className="btn-primary"
+            onClick={() =>
+              setOpenMenu(openMenu === "status" ? "" : "status")
+            }
+          >
             Status ▼
           </button>
 
@@ -175,11 +200,13 @@ export default function Reports() {
           )}
         </div>
 
-        {/* DATE RANGE */}
+        {/* DATE */}
         <div style={{ position: "relative" }}>
           <button
-            className="btn"
-            onClick={() => setOpenMenu(openMenu === "date" ? "" : "date")}
+            className="btn-primary"
+            onClick={() =>
+              setOpenMenu(openMenu === "date" ? "" : "date")
+            }
           >
             Date Range ▼
           </button>
@@ -224,14 +251,14 @@ export default function Reports() {
         </div>
 
         {/* EXPORT */}
-        <button className="btn" onClick={exportCSV}>
+        <button className="btn-primary" onClick={exportCSV}>
           Export CSV
         </button>
       </div>
 
       {/* TABLE */}
-      <div style={{ background: "#fff", borderRadius: 10, padding: 15 }}>
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <div style={{ background: "#fff", borderRadius: 10, padding: 35 }}>
+       <table className="report-table" style={{ width: "100%" }}>
           <thead>
             <tr style={{ textAlign: "left", borderBottom: "1px solid #eee" }}>
               <th>ID</th>
@@ -250,7 +277,14 @@ export default function Reports() {
                 <td>{r.id}</td>
 
                 <td>
-                  <span style={{ padding: "6px 10px", borderRadius: 20, fontSize: 12, ...getTypeStyle(r.type) }}>
+                  <span
+                    style={{
+                      padding: "6px 10px",
+                      borderRadius: 20,
+                      fontSize: 12,
+                      ...getTypeStyle(r.type),
+                    }}
+                  >
                     {r.type}
                   </span>
                 </td>
@@ -259,7 +293,14 @@ export default function Reports() {
                 <td>{r.location}</td>
 
                 <td>
-                  <span style={{ padding: "6px 10px", borderRadius: 20, fontSize: 12, ...getStatusStyle(r.status) }}>
+                  <span
+                    style={{
+                      padding: "6px 10px",
+                      borderRadius: 20,
+                      fontSize: 12,
+                      ...getStatusStyle(r.status),
+                    }}
+                  >
                     {r.status}
                   </span>
                 </td>
@@ -300,10 +341,7 @@ export default function Reports() {
             <p><b>Status:</b> {selectedReport.status}</p>
             <p><b>Date:</b> {selectedReport.time}</p>
 
-            <button
-              onClick={() => setSelectedReport(null)}
-              style={closeBtn}
-            >
+            <button onClick={() => setSelectedReport(null)} style={closeBtn}>
               Close
             </button>
           </div>
@@ -313,11 +351,11 @@ export default function Reports() {
   );
 }
 
-/* styles (DASHBOARD UPGRADE - MODERN SAAS LOOK) */
+/* STYLES (UNCHANGED) */
 
 const dropdownStyle = {
   position: "absolute",
-  top: 48,
+  top: "100%",
   left: 0,
   background: "#ffffff",
   border: "1px solid #eef0f3",
@@ -333,7 +371,6 @@ const itemStyle = {
   cursor: "pointer",
   fontSize: 14,
   background: "#fff",
-  transition: "all 0.2s ease",
   borderBottom: "1px solid #f3f4f6",
   fontWeight: 500,
 };
@@ -358,7 +395,6 @@ const modalBox = {
   borderRadius: 18,
   width: 460,
   boxShadow: "0 25px 60px rgba(0,0,0,0.25)",
-  animation: "popIn 0.18s ease-out",
   border: "1px solid #f1f5f9",
 };
 
@@ -372,7 +408,4 @@ const closeBtn = {
   cursor: "pointer",
   width: "100%",
   fontWeight: 600,
-  fontSize: 14,
-  letterSpacing: "0.3px",
-  boxShadow: "0 8px 20px rgba(99,102,241,0.25)",
 };

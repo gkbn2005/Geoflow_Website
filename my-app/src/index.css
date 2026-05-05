@@ -2,16 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================
+   ANIMATIONS
+========================= */
+
 @keyframes gradientMove {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 @keyframes float {
@@ -20,9 +18,21 @@
   100% { transform: translateY(0px); }
 }
 
+@keyframes popIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 /* =========================
-   Figma Variables (kept)
+   ROOT VARIABLES
 ========================= */
+
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -42,8 +52,9 @@
 }
 
 /* =========================
-   GLOBAL RESET (IMPORTANT)
+   GLOBAL RESET
 ========================= */
+
 html, body {
   height: 100%;
   width: 100%;
@@ -53,9 +64,6 @@ html, body {
   color: var(--text);
 }
 
-/* =========================
-   FIX ROOT (APP MODE)
-========================= */
 #root {
   width: 100%;
   min-height: 100vh;
@@ -67,8 +75,8 @@ html, body {
 /* =========================
    TYPOGRAPHY
 ========================= */
-h1,
-h2 {
+
+h1, h2 {
   font-family: var(--heading);
   font-weight: 500;
   color: var(--text-h);
@@ -84,9 +92,7 @@ h2 {
   margin: 0 0 8px;
 }
 
-p {
-  margin: 0;
-}
+p { margin: 0; }
 
 code {
   font-family: var(--mono);
@@ -96,14 +102,13 @@ code {
 }
 
 /* =========================
-   LOGIN
+   LOGIN BACKGROUND
 ========================= */
 
-/* BACKGROUND ANIMATION */
 .animated-bg {
   background: linear-gradient(270deg, #e6f6ff, #dff3ff, #dbeafe);
   background-size: 600% 600%;
-  animation: gradientMove 6s linear infinite;;
+  animation: gradientMove 6s linear infinite;
 }
 
 /* FLOATING BLOBS */
@@ -119,19 +124,18 @@ code {
   background: #0ea5e9;
   top: 10%;
   left: 10%;
-  animation: float 2s ease-in-out infinite;;
+  animation: float 2s ease-in-out infinite;
 }
 
 .blob-2 {
   background: #60a5fa;
   bottom: 10%;
   right: 10%;
-  animation: float 2s ease-in-out infinite;;
+  animation: float 2s ease-in-out infinite;
 }
 
-
 /* =========================
-   DASHBOARD THEME
+   DASHBOARD BACKGROUND
 ========================= */
 
 .dashboard-bg {
@@ -140,7 +144,10 @@ code {
   background: linear-gradient(135deg, #eef6ff, #f8fbff);
 }
 
-/* glass + soft card system */
+/* =========================
+   CARDS
+========================= */
+
 .card {
   background: #ffffff;
   border: 1px solid #e5e7eb;
@@ -154,64 +161,10 @@ code {
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
 }
 
-/* section titles */
-.section-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a2332;
-  margin-bottom: 16px;
-}
-
-/* stat number */
-.stat-value {
-  font-size: 28px;
-  font-weight: 700;
-  color: #1a2332;
-}
-
-/* stat label */
-.stat-label {
-  font-size: 13px;
-  color: #5b6b7a;
-}
-
-/* subtle divider */
-.divider {
-  height: 1px;
-  background: #eef2f7;
-  margin: 12px 0;
-}
-
-/* dashboard grid improvements */
-.grid-gap {
-  gap: 16px;
-}
-
-/* nicer hover rows */
-.row-hover {
-  transition: background 0.2s ease;
-}
-
-.row-hover:hover {
-  background: #f8fafb;
-}
-
 /* =========================
-   DASHBOARD LAYOUT SYSTEM
+   SIDEBAR
 ========================= */
 
-.dashboard-layout {
-  display: flex;
-  height: 100vh;
-  width: 100%;
-  overflow: hidden;
-}
-
-.dashboard-section {
-  margin-bottom: 32px;
-}
-
-/* Sidebar */
 .sidebar {
   width: 260px;
   background: #ffffff;
@@ -221,7 +174,6 @@ code {
   padding: 20px;
 }
 
-/* Sidebar nav items */
 .nav-item {
   display: flex;
   align-items: center;
@@ -245,15 +197,10 @@ code {
   font-weight: 600;
 }
 
-/* Main content area */
-.main-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
+/* =========================
+   TOPBAR
+========================= */
 
-/* Top header */
 .topbar {
   height: 70px;
   background: #ffffff;
@@ -264,7 +211,10 @@ code {
   padding: 0 24px;
 }
 
-/* search bar */
+/* =========================
+   SEARCH
+========================= */
+
 .search-input {
   width: 100%;
   max-width: 400px;
@@ -279,7 +229,24 @@ code {
   border-color: #1a9ba8;
 }
 
-/* dashboard scroll area */
+/* =========================
+   LAYOUT
+========================= */
+
+.dashboard-layout {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .dashboard-scroll {
   flex: 1;
   overflow-y: auto;
@@ -287,7 +254,7 @@ code {
 }
 
 /* =========================
-   STAT CARDS GRID
+   GRID
 ========================= */
 
 .stats-grid {
@@ -296,7 +263,6 @@ code {
   gap: 24px;
 }
 
-/* responsive fallback */
 @media (max-width: 1200px) {
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -310,7 +276,7 @@ code {
 }
 
 /* =========================
-   CHART LAYOUT
+   CHARTS
 ========================= */
 
 .charts-grid {
@@ -325,13 +291,8 @@ code {
   }
 }
 
-/* chart card spacing */
-.chart-card {
-  padding: 20px;
-}
-
 /* =========================
-   RECENT LIST ENHANCEMENTS
+   LISTS
 ========================= */
 
 .list-item {
@@ -346,7 +307,10 @@ code {
   background: #f8fafb;
 }
 
-/* severity badges */
+/* =========================
+   BADGES
+========================= */
+
 .badge {
   padding: 4px 10px;
   border-radius: 999px;
@@ -370,7 +334,7 @@ code {
 }
 
 /* =========================
-   BUTTONS (dashboard style)
+   BUTTONS
 ========================= */
 
 .btn-primary {
@@ -387,6 +351,80 @@ code {
 .btn-primary:hover {
   background: #0ea5e9;
   transform: scale(1.02);
+}
+
+/* =========================
+   DROPDOWN (CONVERTED)
+========================= */
+
+.dropdown {
+  position: absolute;
+  top: 48px;
+  left: 0;
+  background: #ffffff;
+  border: 1px solid #eef0f3;
+  border-radius: 14px;
+  width: 260px;
+  z-index: 10;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+.dropdown-item {
+  padding: 14px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  background: #fff;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid #f3f4f6;
+  font-weight: 500;
+}
+
+.dropdown-item:hover {
+  background: #f8fafb;
+}
+
+/* =========================
+   MODAL (CONVERTED)
+========================= */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-box {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 18px;
+  width: 460px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+  animation: popIn 0.18s ease-out;
+  border: 1px solid #f1f5f9;
+}
+
+.close-btn {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1, #1a9ba8);
+  color: #fff;
+  cursor: pointer;
+  width: 100%;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  box-shadow: 0 8px 20px rgba(99, 102, 241, 0.25);
 }
 
 /* =========================

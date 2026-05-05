@@ -1,7 +1,7 @@
 import Reports from "./Reports";
+import Analytics from "./Analytics";
 import MapView from "./MapView";
 import Settings from "./Settings";
-import Analytics from "./Analytics";
 
 import { useNavigate, Routes, Route } from "react-router-dom";
 import {

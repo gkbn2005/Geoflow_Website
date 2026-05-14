@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from "react";
 import {
   PieChart,
   Pie,
@@ -14,46 +15,53 @@ import {
 } from "recharts";
 
 export default function Analytics() {
+  // ================= BACKEND STATE =================
+  const [analytics, setAnalytics] = useState(null);
 
-  // ================= DATA =================
-  const pieData = [
-    { name: "Active Leak", value: 56, color: "#ef4444" },
-    { name: "Early Leak", value: 34, color: "#f59e0b" },
-    { name: "Fixed Leak", value: 34, color: "#22c55e" },
-  ];
+  // ================= FETCH FROM LARAVEL =================
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const token = localStorage.getItem("token");
 
-  const lineData = [
-    { month: "Jan", leaks: 18 },
-    { month: "Feb", leaks: 22 },
-    { month: "Mar", leaks: 28 },
-    { month: "Apr", leaks: 24 },
-    { month: "May", leaks: 32 },
-    { month: "Jun", leaks: 38 },
-  ];
+        const res = await fetch("http://127.0.0.1:8000/api/analytics", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
 
-  const barData = [
-    { region: "North", leaks: 45 },
-    { region: "East", leaks: 32 },
-    { region: "South", leaks: 28 },
-    { region: "West", leaks: 50 },
-  ];
+        const data = await res.json();
+        setAnalytics(data);
+      } catch (err) {
+        console.error("Analytics fetch error:", err);
+      }
+    };
 
-  const highRisk = [
-    { name: "Balboa Blvd", count: 12 },
-    { name: "Maple Street", count: 9 },
-    { name: "Cedar Ave", count: 8 },
-    { name: "Pine Road", count: 7 },
-    { name: "Lakeview Dr", count: 6 },
-  ];
+    fetchAnalytics();
+  }, []);
+
+  // ================= DATA (FROM BACKEND) =================
+  const pieData = analytics?.pie || [];
+  const lineData = (analytics?.line || []).map((item) => ({
+    ...item,
+    leaks: Number(item.leaks),
+  }));
+  const barData = analytics?.bar || [];
+  const highRisk = analytics?.highRisk || [];
 
   // ================= UI =================
   return (
     <div>
-
       <h2 style={{ marginBottom: 20 }}>Analytics</h2>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          gap: 20,
+        }}
+      >
         {/* PIE */}
         <div className="card" style={{ padding: 20 }}>
           <h3>Leak Distribution</h3>
@@ -74,12 +82,13 @@ export default function Analytics() {
               </PieChart>
             </ResponsiveContainer>
 
-            {/* LEGEND */}
             <div>
               {pieData.map((item, i) => (
                 <div key={i} style={{ marginBottom: 10 }}>
                   <span style={{ color: item.color }}>●</span> {item.name}
-                  <div><strong>{item.value}</strong></div>
+                  <div>
+                    <strong>{item.value}</strong>
+                  </div>
                 </div>
               ))}
             </div>
@@ -99,7 +108,7 @@ export default function Analytics() {
                 padding: 12,
                 background: "#f5f5f5",
                 borderRadius: 10,
-                marginTop: 10
+                marginTop: 10,
               }}
             >
               <span>{item.name}</span>
@@ -137,9 +146,7 @@ export default function Analytics() {
             </BarChart>
           </ResponsiveContainer>
         </div>
-
       </div>
-
     </div>
   );
 }

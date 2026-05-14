@@ -5,20 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        // validate input
         $request->validate([
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
         ]);
 
-        // create user
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -34,7 +31,7 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
+            'email' => 'required',
             'password' => 'required',
         ]);
 
@@ -55,12 +52,20 @@ class AuthController extends Controller
         ]);
     }
 
-    public function logout(Request $request)
+    public function resetPasswordDirect(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        $user->password = Hash::make($request->password);
+        $user->save();
 
         return response()->json([
-            'message' => 'Logged out successfully'
+            'message' => 'Password updated successfully'
         ]);
     }
 }

@@ -11,24 +11,76 @@ export default function Reports() {
   const [openMenu, setOpenMenu] = useState("");
   const [selectedReport, setSelectedReport] = useState(null);
 
-  // ✅ THIS IS THE IMPORTANT PART (REAL DATA FROM LARAVEL)
+  // ✅ LARAVEL DATA
   const [reportsData, setReportsData] = useState([]);
 
-  // ✅ FETCH FROM LARAVEL BACKEND
+  // ✅ LOADING STATE (NEW)
+  const [loading, setLoading] = useState(true);
+
+  // ✅ FETCH REPORTS FROM LARAVEL
+  const fetchReports = async () => {
+    try {
+      setLoading(true);
+
+      const token = localStorage.getItem("token");
+
+      const res = await fetch("http://127.0.0.1:8000/api/reports", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      });
+
+      const data = await res.json();
+      setReportsData(data);
+    } catch (err) {
+      console.error("Fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/reports")
-      .then((res) => res.json())
-      .then((data) => {
-        console.log("API DATA:", data);
-        setReportsData(data); // store in state
-      })
-      .catch((err) => console.error("Fetch error:", err));
+    fetchReports();
   }, []);
 
+  const updateStatus = async (id, newStatus) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        `http://127.0.0.1:8000/api/reports/${id}`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+
+      if (!res.ok) {
+        console.error("Failed to update status");
+        return;
+      }
+
+      setReportsData((prev) =>
+        prev.map((r) =>
+          r.id === id ? { ...r, status: newStatus } : r
+        )
+      );
+    } catch (err) {
+      console.error("Update error:", err);
+    }
+  };
+
+  // ================= FILTERS =================
   const filteredReports = reportsData.filter((r) => {
     const matchSearch =
-      r.location.toLowerCase().includes(search.toLowerCase()) ||
-      r.report_id.toLowerCase().includes(search.toLowerCase());
+      (r.location || "").toLowerCase().includes(search.toLowerCase()) ||
+      (r.report_id || "").toLowerCase().includes(search.toLowerCase());
 
     const matchType = selectedType === "All" || r.type === selectedType;
     const matchStatus = selectedStatus === "All" || r.status === selectedStatus;
@@ -44,6 +96,7 @@ export default function Reports() {
     return matchSearch && matchType && matchStatus && matchDate;
   });
 
+  // ================= STYLES =================
   const getTypeStyle = (type) => {
     switch (type) {
       case "Active Leak":
@@ -70,6 +123,7 @@ export default function Reports() {
     }
   };
 
+  // ================= EXPORT =================
   const exportCSV = () => {
     const header = "ID,Type,Confidence,Location,Status,Time\n";
 
@@ -82,8 +136,8 @@ export default function Reports() {
 
     const blob = new Blob([header + rows], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
-
     const a = document.createElement("a");
+
     a.href = url;
     a.download = "reports.csv";
     a.click();
@@ -93,44 +147,239 @@ export default function Reports() {
 
   return (
     <div style={{ padding: 20, background: "#f9fafb", minHeight: "100vh" }}>
-      <h2>Reports</h2>
+      {/* LOADING OVERLAY (NEW - NO STYLE CHANGES) */}
+      {loading && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba(255,255,255,0.7)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+          }}
+        >
+          <div style={{ textAlign: "center" }}>
+            <div
+              style={{
+                width: 50,
+                height: 50,
+                border: "5px solid #e5e7eb",
+                borderTop: "5px solid #1a9ba8",
+                borderRadius: "50%",
+                animation: "spin 1s linear infinite",
+                margin: "0 auto",
+              }}
+            />
+            <p style={{ marginTop: 10, color: "#6b7280" }}>
+              Loading reports...
+            </p>
+          </div>
 
+          {/* SPIN ANIMATION */}
+          <style>
+            {`
+              @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+            `}
+          </style>
+        </div>
+      )}
+
+      {/* HEADER */}
+      <h2 style={{ fontSize: 24, fontWeight: 700 }}>Reports</h2>
+
+      <p style={{ color: "#6b7280", marginBottom: 20 }}>
+        Manage and track leak detection reports
+      </p>
+
+      {/* SEARCH */}
       <input
-        placeholder="Search..."
+        type="text"
+        placeholder="Search by Location or Report ID"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
+        style={{
+          padding: 10,
+          width: "300px",
+          borderRadius: 8,
+          border: "1px solid #ddd",
+          marginBottom: 20,
+        }}
       />
 
+      {/* FILTER BAR */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
+        {/* TYPE */}
+        <div style={{ position: "relative" }}>
+          <button className="btn-primary" onClick={() => setOpenMenu(openMenu === "type" ? "" : "type")}>
+            Leak Type ▼
+          </button>
+
+          {openMenu === "type" && (
+            <div style={dropdownStyle}>
+              {["All", "Active Leak", "Early Leak", "Possible Deterioration"].map((t) => (
+                <div
+                  key={t}
+                  onClick={() => {
+                    setSelectedType(t);
+                    setOpenMenu("");
+                  }}
+                  style={itemStyle}
+                >
+                  {t}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* STATUS */}
+        <div style={{ position: "relative" }}>
+          <button className="btn-primary" onClick={() => setOpenMenu(openMenu === "status" ? "" : "status")}>
+            Status ▼
+          </button>
+
+          {openMenu === "status" && (
+            <div style={dropdownStyle}>
+              {["All", "Verified", "Pending", "Under Review"].map((s) => (
+                <div
+                  key={s}
+                  onClick={() => {
+                    setSelectedStatus(s);
+                    setOpenMenu("");
+                  }}
+                  style={itemStyle}
+                >
+                  {s}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* DATE */}
+        <div style={{ position: "relative" }}>
+          <button className="btn-primary" onClick={() => setOpenMenu(openMenu === "date" ? "" : "date")}>
+            Date Range ▼
+          </button>
+
+          {openMenu === "date" && (
+            <div style={dropdownStyle}>
+              <div style={{ padding: 10 }}>
+                <label>Start Date</label>
+                <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} style={{ width: "100%", marginBottom: 10 }} />
+
+                <label>End Date</label>
+                <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} style={{ width: "100%" }} />
+
+                <button
+                  onClick={() => setOpenMenu("")}
+                  style={{
+                    marginTop: 10,
+                    width: "100%",
+                    padding: 8,
+                    background: "#1a9ba8",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: 6,
+                    cursor: "pointer",
+                  }}
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* EXPORT */}
+        <button className="btn-primary" onClick={exportCSV}>
+          Export CSV
+        </button>
+      </div>
+
       {/* TABLE */}
-      <div style={{ background: "#fff", padding: 20, marginTop: 20 }}>
+      <div style={{ background: "#fff", borderRadius: 10, padding: 35 }}>
         <table className="report-table" style={{ width: "100%" }}>
           <thead>
-            <tr>
+            <tr style={{ textAlign: "left", borderBottom: "1px solid #eee" }}>
               <th>ID</th>
-              <th>Type</th>
+              <th>Leak Type</th>
               <th>Confidence</th>
               <th>Location</th>
               <th>Status</th>
               <th>Time</th>
+              <th>Action</th>
             </tr>
           </thead>
 
           <tbody>
-            {filteredReports.map((r) => (
-              <tr key={r.id}>
-                <td>{r.report_id}</td>
-                <td>{r.type}</td>
-                <td>{r.confidence}%</td>
-                <td>{r.location}</td>
-                <td>{r.status}</td>
-                <td>{r.time}</td>
-              </tr>
-            ))}
+            {!loading &&
+              filteredReports.map((r) => (
+                <tr key={r.id} style={{ borderBottom: "1px solid #eee" }}>
+                  <td>{r.report_id}</td>
+                  <td>
+                    <span style={{ padding: "6px 10px", borderRadius: 20, fontSize: 12, ...getTypeStyle(r.type) }}>
+                      {r.type}
+                    </span>
+                  </td>
+                  <td>{r.confidence}%</td>
+                  <td>{r.location}</td>
+                  <td>
+                    <select
+                      value={r.status}
+                      onChange={(e) => updateStatus(r.id, e.target.value)}
+                      style={{
+                        padding: "6px 10px",
+                        borderRadius: 20,
+                        fontSize: 12,
+                        border: "1px solid #ddd",
+                        outline: "none",
+                        ...getStatusStyle(r.status),
+                      }}
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Verified">Verified</option>
+                      <option value="Under Review">Under Review</option>
+                    </select>
+                  </td>
+                  <td>{r.time}</td>
+                  <td>
+                    <button onClick={() => setSelectedReport(r)} style={{ padding: "6px 12px", borderRadius: 6, border: "none", background: "#1a9ba8", color: "#fff" }}>
+                      View
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
 
-      <button onClick={exportCSV}>Export CSV</button>
+      {/* MODAL */}
+      {selectedReport && (
+        <div style={modalOverlay}>
+          <div style={modalBox}>
+            <h2 style={{ marginBottom: 10 }}>Report Details</h2>
+            <p><b>ID:</b> {selectedReport.report_id}</p>
+            <p><b>Type:</b> {selectedReport.type}</p>
+            <p><b>Confidence:</b> {selectedReport.confidence}%</p>
+            <p><b>Location:</b> {selectedReport.location}</p>
+            <p><b>Status:</b> {selectedReport.status}</p>
+            <p><b>Date:</b> {selectedReport.time}</p>
+
+            <button onClick={() => setSelectedReport(null)} style={closeBtn}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

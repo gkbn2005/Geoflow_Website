@@ -1,15 +1,17 @@
+import { useNavigate, Routes, Route } from "react-router-dom";
+import { useEffect, useState } from "react";
+
 import Reports from "./Reports";
 import Analytics from "./Analytics";
 import MapView from "./MapView";
 import Settings from "./Settings";
 
-import { useNavigate, Routes, Route } from "react-router-dom";
 import {
   LayoutDashboard,
   Map,
   FileText,
   BarChart3,
- Settings as SettingsIcon,
+  Settings as SettingsIcon,
   LogOut,
   Search,
   User,
@@ -36,51 +38,50 @@ export default function Dashboard() {
 
   const handleLogout = () => {
     const confirmLogout = window.confirm("Are you sure you want to log out?");
-
     if (confirmLogout) {
-      // optional: clear auth data
       localStorage.removeItem("token");
-
       navigate("/login");
     }
   };
 
-  // ===================== DATA =====================
-  const stats = [
-    { label: "Total Leaks", value: "124", change: "+12%", color: "#6366f1", icon: AlertCircle },
-    { label: "Active Leaks", value: "56", change: "+8%", color: "#ef4444", icon: AlertCircle },
-    { label: "Resolved Today", value: "18", change: "+5%", color: "#22c55e", icon: CheckCircle2 },
-    { label: "Avg Response Time", value: "2.4h", change: "-15%", color: "#0ea5e9", icon: Clock },
-  ];
+  // ================= BACKEND STATE =================
+  const [dashboardData, setDashboardData] = useState(null);
 
-  const lineData = [
-    { day: "Mon", leaks: 12 },
-    { day: "Tue", leaks: 18 },
-    { day: "Wed", leaks: 15 },
-    { day: "Thu", leaks: 22 },
-    { day: "Fri", leaks: 19 },
-    { day: "Sat", leaks: 16 },
-    { day: "Sun", leaks: 14 },
-  ];
+  // ================= FETCH DASHBOARD =================
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const token = localStorage.getItem("token");
 
-  const pieData = [
-    { name: "Active", value: 56, color: "#ef4444" },
-    { name: "Early", value: 34, color: "#f59e0b" },
-    { name: "Resolved", value: 34, color: "#22c55e" },
-  ];
+        const res = await fetch("http://127.0.0.1:8000/api/dashboard", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
 
-  const recentLeaks = [
-    { id: "GF-1023", location: "Balboa Blvd", severity: "High" },
-    { id: "GF-1022", location: "Maple St", severity: "Medium" },
-    { id: "GF-1021", location: "Cedar Ave", severity: "Low" },
-  ];
+        const data = await res.json();
+        setDashboardData(data);
+      } catch (err) {
+        console.error("Dashboard fetch error:", err);
+      }
+    };
+
+    fetchDashboard();
+  }, []);
+
+  // ================= DATA FROM BACKEND =================
+  const stats = dashboardData?.stats || [];
+  const lineData = dashboardData?.lineData || [];
+  const pieData = dashboardData?.pieData || [];
+  const recentLeaks = dashboardData?.recentLeaks || [];
 
   const getSeverityColor = (s) =>
     s === "High" ? "#ef4444" :
     s === "Medium" ? "#f59e0b" :
     "#22c55e";
 
-  // ===================== DASHBOARD HOME =====================
+  // ================= DASHBOARD HOME =================
   const DashboardHome = () => (
     <div>
 
@@ -146,7 +147,7 @@ export default function Dashboard() {
     </div>
   );
 
-  // ===================== MAIN =====================
+  // ================= MAIN =================
   return (
     <div style={{ display: "flex", height: "100vh" }}>
 
@@ -170,17 +171,13 @@ export default function Dashboard() {
           <BarChart3 size={18} /> Analytics
         </div>
 
-       <div className="nav-item" onClick={() => navigate("/dashboard/settings")}>
-         <SettingsIcon size={18} /> Settings
-       </div>
+        <div className="nav-item" onClick={() => navigate("/dashboard/settings")}>
+          <SettingsIcon size={18} /> Settings
+        </div>
 
-          <div
-            className="nav-item"
-            style={{ marginTop: "auto" }}
-            onClick={handleLogout}
-          >
-            <LogOut size={18} /> Logout
-          </div>
+        <div className="nav-item" style={{ marginTop: "auto" }} onClick={handleLogout}>
+          <LogOut size={18} /> Logout
+        </div>
       </div>
 
       {/* MAIN CONTENT */}
@@ -199,22 +196,17 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* ROUTES (IMPORTANT FIX - NO WHITE PAGE) */}
+        {/* ROUTES */}
         <div style={{ padding: 24, overflow: "auto" }}>
-
           <Routes>
-
-            {/* Dashboard Home */}
             <Route index element={<DashboardHome />} />
             <Route path="reports" element={<Reports />} />
             <Route path="map" element={<MapView />} />
             <Route path="settings" element={<Settings />} />
             <Route path="analytics" element={<Analytics />} />
-
-
           </Routes>
-
         </div>
+
       </div>
     </div>
   );

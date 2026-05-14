@@ -1,33 +1,85 @@
 import "leaflet/dist/leaflet.css";
-
+import { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup, Circle } from "react-leaflet";
+import L from "leaflet";
 
-// Sample data
-const leaks = [
-  { id: 1, lat: 14.5995, lng: 120.9842, status: "Active" },
-  { id: 2, lat: 14.601, lng: 120.982, status: "Early" },
-  { id: 3, lat: 14.598, lng: 120.986, status: "Resolved" },
-];
+// ================= FIX MARKER ICON ISSUE =================
+delete L.Icon.Default.prototype._getIconUrl;
 
-// Marker colors
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  shadowUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
+
+// ================= STATUS COLOR =================
 const getColor = (status) => {
   switch (status) {
-    case "Active": return "red";
-    case "Early": return "orange";
-    case "Resolved": return "green";
-    default: return "gray";
+    case "Active Leak":
+    case "Active":
+      return "red";
+
+    case "Early Leak":
+    case "Early":
+      return "orange";
+
+    case "Resolved":
+      return "green";
+
+    default:
+      return "gray";
   }
 };
 
 export default function MapView() {
+  const [leaks, setLeaks] = useState([]);
+
+  // ================= FETCH REPORTS =================
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch("http://127.0.0.1:8000/api/reports", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+
+        const data = await res.json();
+
+        console.log("REPORTS:", data); // 👈 IMPORTANT DEBUG
+
+        const mapped = data.map((r) => ({
+          id: r.id,
+          report_id: r.report_id,
+          lat: Number(r.lat),
+          lng: Number(r.lng),
+          status: r.type || r.status,
+        }));
+
+        setLeaks(mapped);
+      } catch (err) {
+        console.error("Error fetching reports:", err);
+      }
+    };
+
+    fetchReports();
+  }, []);
+
   return (
     <div style={{ height: "100%", width: "100%", position: "relative" }}>
 
-      {/* LEGEND (OVERLAY) */}
+      {/* LEGEND */}
       <div className="map-legend">
         <span><span style={{ color: "red" }}>●</span> Active Leak</span>
         <span><span style={{ color: "orange" }}>●</span> Early Leak</span>
-        <span><span style={{ color: "green" }}>●</span> No Leak</span>
+        <span><span style={{ color: "green" }}>●</span> Resolved</span>
       </div>
 
       {/* MAP */}
@@ -41,36 +93,32 @@ export default function MapView() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
+        {/* ================= MARKERS (FIXED: NO DIV WRAPPER) ================= */}
         {leaks.map((leak) => (
-          <div key={leak.id}>
-            {/* Marker */}
-            <Marker position={[leak.lat, leak.lng]}>
-              <Popup>
-                Leak #{leak.id} <br />
-                Status: {leak.status}
-              </Popup>
-            </Marker>
+          <Marker key={leak.id} position={[leak.lat, leak.lng]}>
+            <Popup>
+              Report #{leak.report_id} <br />
+              Status: {leak.status}
+            </Popup>
 
-            {/* Glow circle */}
             <Circle
               center={[leak.lat, leak.lng]}
               radius={120}
               pathOptions={{
                 color: getColor(leak.status),
-                fillOpacity: 0.15
+                fillOpacity: 0.15,
               }}
             />
 
-            {/* Inner circle */}
             <Circle
               center={[leak.lat, leak.lng]}
               radius={60}
               pathOptions={{
                 color: getColor(leak.status),
-                fillOpacity: 0.4
+                fillOpacity: 0.4,
               }}
             />
-          </div>
+          </Marker>
         ))}
       </MapContainer>
     </div>

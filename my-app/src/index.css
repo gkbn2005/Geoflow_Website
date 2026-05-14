@@ -55,7 +55,13 @@
    GLOBAL RESET
 ========================= */
 
-html, body {
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+html, body #root{
   height: 100%;
   width: 100%;
   margin: 0;
@@ -360,6 +366,72 @@ code {
   max-width: 1200px;
 }
 
+/* DROPDOWN */
+.dropdown-style {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: #ffffff;
+  border: 1px solid #eef0f3;
+  border-radius: 14px;
+  width: 260px;
+  z-index: 10;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+}
+
+/* DROPDOWN ITEM */
+.item-style {
+  padding: 14px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  background: #fff;
+  border-bottom: 1px solid #f3f4f6;
+  font-weight: 500;
+}
+
+.item-style:hover {
+  background: #f9fafb;
+}
+
+/* MODAL OVERLAY */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* MODAL BOX */
+.modal-box {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 18px;
+  width: 460px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+  border: 1px solid #f1f5f9;
+}
+
+/* CLOSE BUTTON */
+.close-btn {
+  margin-top: 20px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1, #1a9ba8);
+  color: #fff;
+  cursor: pointer;
+  width: 100%;
+  font-weight: 600;
+}
+
 /* TABLE FIX (THIS IS THE IMPORTANT PART) */
 
 .report-table {
@@ -444,4 +516,33 @@ code {
   background: #1a9ba8;
   color: white;
   box-shadow: 0 4px 12px rgba(26, 155, 168, 0.25);
+}
+
+/* =========================
+   MAP LEGEND (FIX MISSING STYLE)
+========================= */
+
+.map-legend {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 10px 14px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  z-index: 1000;
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+}
+
+.map-legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }

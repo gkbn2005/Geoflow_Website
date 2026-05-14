@@ -18,4 +18,22 @@ class ReportController extends Controller
     {
         return Report::create($request->all());
     }
+
+    public function update(Request $request, $id)
+    {
+        $report = Report::findOrFail($id);
+
+        $request->validate([
+            'status' => 'required|string'
+        ]);
+
+        $report->update([
+            'status' => $request->status
+        ]);
+
+        return response()->json([
+            'message' => 'Status updated successfully',
+            'report' => $report
+        ]);
+    }
 }

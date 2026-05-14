@@ -1,50 +1,108 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Dashboard from "./Dashboard";
-
 export default function Login() {
   const navigate = useNavigate();
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
- const handleSubmit = async (e) => {
-   e.preventDefault();
+  const [showReset, setShowReset] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [resetMessage, setResetMessage] = useState("");
 
-   if (!username || !password) {
-     alert("Please fill in all fields");
-     return;
-   }
+  // ================= LOGIN =================
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-   try {
-     const res = await fetch("http://127.0.0.1:8000/api/login", {
-       method: "POST",
-       headers: {
-         "Content-Type": "application/json",
-       },
-       body: JSON.stringify({
-         email: username, // IMPORTANT: backend expects email
-         password: password,
-       }),
-     });
+    if (!email || !password) {
+      alert("Please fill in all fields");
+      return;
+    }
 
-     const data = await res.json();
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
 
-     if (res.ok && data.token) {
-       localStorage.setItem("token", data.token);
+      const data = await res.json();
 
-       console.log("Login success");
+      if (res.ok && data.token) {
+        localStorage.setItem("token", data.token);
+        navigate("/Dashboard");
+      } else {
+        alert(data.message || "Login failed");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      alert("Email or Password is Incorrect");
+    }
+  };
 
-       navigate("/Dashboard");
-     } else {
-       alert(data.message || "Login failed");
-     }
-   } catch (err) {
-     console.error("Email or Password is Incorrect!", err);
-     alert("Server error (check Laravel)");
-   }
- };
+  // ================= DIRECT RESET PASSWORD =================
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+
+    if (!resetEmail || !newPassword) {
+      alert("Please fill in all fields");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        "http://127.0.0.1:8000/api/reset-password-direct",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            email: resetEmail,
+            password: newPassword,
+            password_confirmation: newPassword,
+          }),
+        }
+      );
+
+      const data = await res.json();
+
+      console.log("RESET RESPONSE:", data); // 👈 DEBUG (important)
+
+      // ❗ Laravel validation error handling (THIS was missing)
+      if (!res.ok) {
+        const errorMessage =
+          data.message ||
+          (data.errors
+            ? Object.values(data.errors).flat().join(", ")
+            : "Reset failed");
+
+        setResetMessage(errorMessage);
+        return;
+      }
+
+      setResetMessage("Password updated successfully.");
+
+      setTimeout(() => {
+        setShowReset(false);
+        setResetEmail("");
+        setNewPassword("");
+        setResetMessage("");
+      }, 1500);
+
+    } catch (err) {
+      console.error("Reset error:", err);
+      setResetMessage("Something went wrong (server error)");
+    }
+  };
 
   return (
     <div
@@ -59,11 +117,9 @@ export default function Login() {
         overflow: "hidden",
       }}
     >
-      {/* 🔵 BLOBS */}
       <div className="blob blob-1"></div>
       <div className="blob blob-2"></div>
 
-      {/* LOGIN CARD */}
       <div
         style={{
           width: "420px",
@@ -97,75 +153,177 @@ export default function Login() {
           </p>
         </div>
 
-        {/* FORM */}
-        <form onSubmit={handleSubmit}>
-          <div style={{ textAlign: "left", marginBottom: "15px" }}>
-            <label>Username</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="Enter Username"
+        {/* ================= LOGIN ================= */}
+        {!showReset && (
+          <form onSubmit={handleSubmit}>
+            <div style={{ textAlign: "left", marginBottom: "15px" }}>
+              <label>Email</label>
+              <input
+                type="text"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter Email"
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginTop: "5px",
+                  borderRadius: "8px",
+                  border: "1px solid #ddd",
+                }}
+              />
+            </div>
+
+            <div style={{ textAlign: "left", marginBottom: "20px" }}>
+              <label>Password</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter Password"
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginTop: "5px",
+                  borderRadius: "8px",
+                  border: "1px solid #ddd",
+                }}
+              />
+            </div>
+
+            <button
+              type="submit"
               style={{
                 width: "100%",
-                padding: "10px",
-                marginTop: "5px",
-                borderRadius: "8px",
-                border: "1px solid #ddd",
+                padding: "12px",
+                background: "#0ea5e9",
+                color: "white",
+                border: "none",
+                borderRadius: "10px",
+                fontWeight: "bold",
+                cursor: "pointer",
               }}
-            />
-          </div>
+            >
+              Login
+            </button>
 
-          <div style={{ textAlign: "left", marginBottom: "20px" }}>
-            <label>Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Enter Password"
+            {/* Forgot Password */}
+            <button
+              type="button"
+              onClick={() => setShowReset(true)}
+              style={{
+                marginTop: "10px",
+                width: "100%",
+                padding: "12px",
+                background: "transparent",
+                color: "#0ea5e9",
+                border: "1px solid #0ea5e9",
+                borderRadius: "10px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              Forgot Password?
+            </button>
+
+            {/* Signup */}
+            <button
+              type="button"
+              onClick={() => navigate("/signup")}
+              style={{
+                marginTop: "10px",
+                width: "100%",
+                padding: "12px",
+                background: "transparent",
+                color: "#0ea5e9",
+                border: "1px solid #0ea5e9",
+                borderRadius: "10px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              Create Account
+            </button>
+          </form>
+        )}
+
+        {/* ================= RESET PASSWORD ================= */}
+        {showReset && (
+          <form onSubmit={handleResetPassword}>
+            <div style={{ textAlign: "left", marginBottom: "15px" }}>
+              <label>Email</label>
+              <input
+                type="email"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
+                placeholder="Enter your email"
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginTop: "5px",
+                  borderRadius: "8px",
+                  border: "1px solid #ddd",
+                }}
+              />
+            </div>
+
+            <div style={{ textAlign: "left", marginBottom: "15px" }}>
+              <label>New Password</label>
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder="Enter new password"
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  marginTop: "5px",
+                  borderRadius: "8px",
+                  border: "1px solid #ddd",
+                }}
+              />
+            </div>
+
+            <button
+              type="submit"
               style={{
                 width: "100%",
-                padding: "10px",
-                marginTop: "5px",
-                borderRadius: "8px",
-                border: "1px solid #ddd",
+                padding: "12px",
+                background: "#0ea5e9",
+                color: "white",
+                border: "none",
+                borderRadius: "10px",
+                fontWeight: "bold",
+                cursor: "pointer",
               }}
-            />
-          </div>
+            >
+              Reset Password
+            </button>
 
-          <button
-            type="submit"
-            style={{
-              width: "100%",
-              padding: "12px",
-              background: "#0ea5e9",
-              color: "white",
-              border: "none",
-              borderRadius: "10px",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-          >
-            Login
-          </button>
-          <button
-            type="button"
-            onClick={() => navigate("/signup")}
-            style={{
-              marginTop: "10px",
-              width: "100%",
-              padding: "12px",
-              background: "transparent",
-              color: "#0ea5e9",
-              border: "1px solid #0ea5e9",
-              borderRadius: "10px",
-              fontWeight: "bold",
-              cursor: "pointer",
-            }}
-          >
-            Create Account
-          </button>
-        </form>
+            <button
+              type="button"
+              onClick={() => setShowReset(false)}
+              style={{
+                marginTop: "10px",
+                width: "100%",
+                padding: "12px",
+                background: "transparent",
+                color: "#0ea5e9",
+                border: "1px solid #0ea5e9",
+                borderRadius: "10px",
+                fontWeight: "bold",
+                cursor: "pointer",
+              }}
+            >
+              Back to Login
+            </button>
+
+            {resetMessage && (
+              <p style={{ marginTop: 10, fontSize: 13, color: "#555" }}>
+                {resetMessage}
+              </p>
+            )}
+          </form>
+        )}
       </div>
     </div>
   );
